@@ -38,7 +38,7 @@
       (println "Starting NyTimesClient")
 
       (let [{:keys [api-key]}
-            (clojure.edn/read-string (slurp "secrets/secrets.edn"))]
+            (clojure.edn/read-string (slurp "secrets/secrets.edn"))] ;TODO do this better
         (assoc component :api-key api-key)))
 
     (stop [component]
