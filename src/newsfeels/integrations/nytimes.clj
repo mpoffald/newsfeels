@@ -3,14 +3,33 @@
    [clj-http.client :as client]
    [com.stuartsierra.component :as component]))
 
-(def domain "https://api.nytimes.com/")
+(def host "https://api.nytimes.com/")
+(def popularity-types
+  {:emailed "emailed/"
+   :shared "shared/"
+   :viewed "viewed/"})
 
-(defn get-most-popular
+(defn call-nytimes-mostpopular
+  [client popularity-type period & opts]
+  (let [api-path "svc/mostpopular/"
+        version-str "v2/"
+        {:keys [api-key]} client]
+    (client/get
+     (str host api-path version-str (get popularity-types popularity-type) period ".json")
+     {:as :json
+      :query-params {"api-key" api-key}})))
+
+(defn get-most-emailed
   [client period]
-  (let [{:keys [api-key]} client]
-    (client/get (str domain "svc/mostpopular/v2/emailed/" period ".json")
-                {:as :json
-                 :query-params {"api-key" api-key}})))
+  (call-nytimes-mostpopular client :emailed period))
+
+(defn get-most-shared
+  [client period]                       ;TODO support optional shared-method
+  (call-nytimes-mostpopular client :shared period))
+
+(defn get-most-viewed
+  [client period]
+  (call-nytimes-mostpopular client :viewed period))
 
 (defrecord NyTimesClient
     []
