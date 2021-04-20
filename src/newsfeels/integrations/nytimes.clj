@@ -3,7 +3,6 @@
    [clj-http.client :as client]
    [com.stuartsierra.component :as component]))
 
-(def host "https://api.nytimes.com/")
 (def popularity-types
   {:emailed "emailed/"
    :shared "shared/"
@@ -13,7 +12,7 @@
   [client popularity-type period & opts]
   (let [api-path "svc/mostpopular/"
         version-str "v2/"
-        {:keys [api-key]} client]
+        {:keys [api-key host]} client]
     (client/get
      (str host api-path version-str (get popularity-types popularity-type) period ".json")
      {:as :json

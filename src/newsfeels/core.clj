@@ -5,7 +5,8 @@
 
 (defn system
   []
-  (component/system-map
-   :nytimes (nytimes/nytimes-client {})))
+  (let [config (clojure.edn/read-string (slurp "config/config.edn"))]
+    (component/system-map
+     :nytimes (nytimes/nytimes-client (get config :nytimes)))))
 
 (def example-system (component/start (system)))
