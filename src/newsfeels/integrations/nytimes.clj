@@ -15,13 +15,16 @@
     (client/get url {:as :json
                      :query-params {"api-key" api-key}})))
 
-(defn get-mostpopular-results 
-  [client popularity-type period & opts]
+(defn build-mostpopular-path
+  [popularity-type period & opts]
   (let [api-path "svc/mostpopular/"
-        version-str "v2/"
-        url
-        (str api-path version-str (get popularity-types popularity-type) period ".json")
-        response (call-nytimes-api client url)]
+        version-str "v2/"]
+    (str api-path version-str (get popularity-types popularity-type) period ".json")))
+
+(defn get-mostpopular-results 
+  [client popularity-type period]
+  (let [path (build-mostpopular-path popularity-type period)
+        response (call-nytimes-api client path)]
     (when (= 200 (:status response))
       (get-in response [:body :results]))))
 
