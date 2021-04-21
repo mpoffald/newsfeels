@@ -6,6 +6,8 @@
 (deftest test-build-mostpopular-path
   (is (= "svc/mostpopular/v2/shared/1.json"
          (nytimes/build-mostpopular-path :shared 1)))
+  (is (= "svc/mostpopular/v2/shared/1/facebook.json"
+         (nytimes/build-mostpopular-path :shared 1 "facebook")))
   (is (= "svc/mostpopular/v2/viewed/1.json"
          (nytimes/build-mostpopular-path :viewed 1)))
   (is (= "svc/mostpopular/v2/emailed/1.json"

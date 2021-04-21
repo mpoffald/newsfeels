@@ -16,25 +16,36 @@
                      :query-params {"api-key" api-key}})))
 
 (defn build-mostpopular-path
-  [popularity-type period & opts]
-  (let [api-path "svc/mostpopular/"
-        version-str "v2/"]
-    (str api-path version-str (get popularity-types popularity-type) period ".json")))
+  ([popularity-type period]
+   (let [api-path "svc/mostpopular/"
+         version-str "v2/"]
+     (str api-path version-str (get popularity-types popularity-type) period ".json")))
+  ([popularity-type period filter-by]
+   (let [api-path "svc/mostpopular/"
+         version-str "v2/"]
+     (str api-path version-str (get popularity-types popularity-type) period "/" filter-by ".json"))))
 
 (defn get-mostpopular-results 
-  [client popularity-type period]
-  (let [path (build-mostpopular-path popularity-type period)
-        response (call-nytimes-api client path)]
-    (when (= 200 (:status response))
-      (get-in response [:body :results]))))
+  ([client popularity-type period]
+   (let [path (build-mostpopular-path popularity-type period)
+         response (call-nytimes-api client path)]
+     (when (= 200 (:status response))
+       (get-in response [:body :results]))))
+  ([client popularity-type period filter-by]
+   (let [path (build-mostpopular-path popularity-type period filter-by)
+         response (call-nytimes-api client path)]
+     (when (= 200 (:status response))
+       (get-in response [:body :results])))))
 
 (defn get-most-emailed
   [client period]
   (get-mostpopular-results client :emailed period))
 
 (defn get-most-shared
-  [client period]                       ;TODO support optional shared-method
-  (get-mostpopular-results client :shared period))
+  ([client period]     
+   (get-mostpopular-results client :shared period))
+  ([client period share-type]
+   (get-mostpopular-results client :shared period share-type)))
 
 (defn get-most-viewed
   [client period]
