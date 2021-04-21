@@ -8,27 +8,34 @@
    :shared "shared/"
    :viewed "viewed/"})
 
-(defn call-nytimes-mostpopular
+(defn call-nytimes-api
+  [client path]
+  (let [{:keys [api-key host]} client
+        url (str host path)]
+    (client/get url {:as :json
+                     :query-params {"api-key" api-key}})))
+
+(defn get-mostpopular-results 
   [client popularity-type period & opts]
   (let [api-path "svc/mostpopular/"
         version-str "v2/"
-        {:keys [api-key host]} client]
-    (client/get
-     (str host api-path version-str (get popularity-types popularity-type) period ".json")
-     {:as :json
-      :query-params {"api-key" api-key}})))
+        url
+        (str api-path version-str (get popularity-types popularity-type) period ".json")
+        response (call-nytimes-api client url)]
+    (when (= 200 (:status response))
+      (get-in response [:body :results]))))
 
 (defn get-most-emailed
   [client period]
-  (call-nytimes-mostpopular client :emailed period))
+  (get-mostpopular-results client :emailed period))
 
 (defn get-most-shared
   [client period]                       ;TODO support optional shared-method
-  (call-nytimes-mostpopular client :shared period))
+  (get-mostpopular-results client :shared period))
 
 (defn get-most-viewed
   [client period]
-  (call-nytimes-mostpopular client :viewed period))
+  (get-mostpopular-results client :viewed period))
 
 (defrecord NyTimesClient
     []
