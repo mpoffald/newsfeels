@@ -5,10 +5,15 @@
 
 (deftest test-build-mostpopular-path
   (is (= "svc/mostpopular/v2/shared/1.json"
-         (nytimes/build-mostpopular-path :shared 1)))
+         (nytimes/build-mostpopular-path {:popularity-measure  :shared
+                                          :period 1})))
   (is (= "svc/mostpopular/v2/shared/1/facebook.json"
-         (nytimes/build-mostpopular-path :shared 1 "facebook")))
+         (nytimes/build-mostpopular-path {:popularity-measure :shared
+                                          :period 1
+                                          :share-type "facebook"})))
   (is (= "svc/mostpopular/v2/viewed/1.json"
-         (nytimes/build-mostpopular-path :viewed 1)))
+         (nytimes/build-mostpopular-path {:popularity-measure :viewed
+                                          :period  1})))
   (is (= "svc/mostpopular/v2/emailed/1.json"
-         (nytimes/build-mostpopular-path :emailed 1))))
+         (nytimes/build-mostpopular-path {:popularity-measure :emailed
+                                          :period 1}))))

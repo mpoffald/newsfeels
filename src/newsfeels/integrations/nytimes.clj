@@ -3,7 +3,7 @@
    [clj-http.client :as client]
    [com.stuartsierra.component :as component]))
 
-(def popularity-types
+(def popularity-measures
   {:emailed "emailed/"
    :shared "shared/"
    :viewed "viewed/"})
@@ -16,40 +16,43 @@
                      :query-params {"api-key" api-key}})))
 
 (defn build-mostpopular-path
-  ([popularity-type period]
-   (let [api-path "svc/mostpopular/"
-         version-str "v2/"]
-     (str api-path version-str (get popularity-types popularity-type) period ".json")))
-  ([popularity-type period filter-by]
-   (let [api-path "svc/mostpopular/"
-         version-str "v2/"]
-     (str api-path version-str (get popularity-types popularity-type) period "/" filter-by ".json"))))
+  [op-map]
+  (let [{:keys [:popularity-measure :period :share-type]} op-map
+        api-path "svc/mostpopular/"     ;TODO put in config?
+        version-str "v2/"
+        share-type-param (some->> share-type
+                                  (str "/"))]
+    (str api-path
+         version-str
+         (get popularity-measures popularity-measure)
+         period
+         share-type-param
+         ".json")))
 
 (defn get-mostpopular-results 
-  ([client popularity-type period]
-   (let [path (build-mostpopular-path popularity-type period)
-         response (call-nytimes-api client path)]
-     (when (= 200 (:status response))
-       (get-in response [:body :results]))))
-  ([client popularity-type period filter-by]
-   (let [path (build-mostpopular-path popularity-type period filter-by)
-         response (call-nytimes-api client path)]
-     (when (= 200 (:status response))
-       (get-in response [:body :results])))))
+  [client op-map]
+  (let [path (build-mostpopular-path op-map)
+        response (call-nytimes-api client path)]
+    (when (= 200 (:status response))
+      (get-in response [:body :results]))))
 
 (defn get-most-emailed
   [client period]
-  (get-mostpopular-results client :emailed period))
+  (get-mostpopular-results client {:popularity-type :emailed
+                                   :period period}))
 
 (defn get-most-shared
-  ([client period]     
-   (get-mostpopular-results client :shared period))
-  ([client period share-type]
-   (get-mostpopular-results client :shared period share-type)))
+  [client period & [share-type]]
+  (let [base-op-map {:popularity-measure :shared
+                     :period period
+                     :share-type share-type}
+        op-map (into {} (filter (comp some? val) base-op-map))]
+    (get-mostpopular-results client op-map)))
 
 (defn get-most-viewed
   [client period]
-  (get-mostpopular-results client :viewed period))
+  (get-mostpopular-results client {:popuarity-type :viewed
+                                   :period period}))
 
 (defrecord NyTimesClient
     []
