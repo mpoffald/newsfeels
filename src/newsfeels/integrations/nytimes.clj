@@ -1,6 +1,7 @@
 (ns newsfeels.integrations.nytimes
   (:require
    [clj-http.client :as client]
+   [clojure.string :as str]
    [com.stuartsierra.component :as component]))
 
 (def popularity-measures
@@ -28,6 +29,40 @@
          period
          share-type-param
          ".json")))
+
+(defn build-article-id
+  [raw-article-data]
+  (let [{:keys [:uri]} raw-article-data
+        sha (last (str/split uri #"/"))]
+    (str "nytimes-" sha)))
+
+(defn standardize-result
+  ;; FIXME this definitely needs a docstring
+  ;; FIXME add a field for the time the result was retrieved 
+  [raw-article-data]
+  (let [raw-article-data (dissoc raw-article-data
+                                 :asset_id
+                                 :id
+                                 :media)
+        {:keys [:published_date :title :abstract :updated]} raw-article-data
+        article-id (build-article-id raw-article-data)
+        article-data-standardized-keys (into {}
+                                             (map (fn [[k v]]
+                                                    (let [cleaned (-> k
+                                                                      (name)
+                                                                      (str/replace "_" "-"))
+                                                          new-k (keyword  (str "newsfeels.integrations.nytimes/" cleaned))]
+                                                      [new-k v]))
+                                                  raw-article-data))]
+    (-> article-data-standardized-keys
+        (assoc :newsfeels.article/source :nytimes)
+        (assoc :newsfeels.article/id article-id)
+        (assoc :newsfeels.article/headline title)
+        (assoc :newsfeels.article/abstract abstract)
+        (update :newsfeels.integrations.nytimes/adx-keywords #(str/split % #";"))
+        ;; FIXME parse into actual times instead
+        (assoc :newsfeels.article/published-date published_date)
+        (assoc :newsfeels.article/updated-time updated))))
 
 (defn get-mostpopular-results 
   [client op-map]
