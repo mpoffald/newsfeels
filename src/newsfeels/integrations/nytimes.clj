@@ -68,7 +68,7 @@
   [client op-map]
   (let [path (build-mostpopular-path op-map)
         response (call-nytimes-api client path)]
-    (when (= 200 (:status response))
+    (when (= 200 (:status response))  ;TODO log/warn non-200 responses
       (get-in response [:body :results]))))
 
 (defn get-most-emailed
