@@ -75,20 +75,31 @@
          (nytimes/build-article-id complete-example-result))))
 
 (deftest test-standardized-result
-  (let [standardized (nytimes/standardize-result complete-example-result)]
-    (is (= :nytimes
-           (get standardized :newsfeels.article/source)))
-    (is (= correct-standardized-id
-           (get standardized :newsfeels.article/id)))
-    (testing "use title as headline"
-      (is (= (:title complete-example-result) 
-             (get standardized :newsfeels.article/headline))))
-    (is (= (:abstract complete-example-result) 
-           (get standardized :newsfeels.article/abstract)))
-    (is (= (:published_date complete-example-result) ;FIXME should be a parsed date, not a string
-           (get standardized :newsfeels.article/published-date)))
-    (testing "correctly parses list of adx keywords"
+  (let [standardized (nytimes/standardize-result complete-example-result)
+        raw-article-path [:newsfeels.article/article :newsfeels.article/raw-article-data]
+        article-text-path [:newsfeels.article/article :newsfeels.article/article-text]]
+    (testing "both raw data and article text contain the source"
+      (is (= :nytimes
+             (get-in standardized (conj raw-article-path :newsfeels.article/source))
+             (get-in standardized (conj article-text-path :newsfeels.article/source)))))
+    (testing "both raw data and article text share the correct id"
+      (is (= correct-standardized-id
+             (get-in standardized (conj raw-article-path :newsfeels.article/id))
+             (get-in standardized (conj article-text-path :newsfeels.article/id)))))
+    (testing "both raw data and article share correct title, article text uses it as the headline"
+      (is (= (:title complete-example-result)
+             (get-in standardized (conj raw-article-path :newsfeels.integrations.nytimes/title))
+             (get-in standardized (conj article-text-path :newsfeels.article/headline)))))
+    (testing "both raw data and article text have correct abstract"
+      (is (= (:abstract complete-example-result) 
+             (get-in standardized (conj raw-article-path :newsfeels.integrations.nytimes/abstract))
+             (get-in standardized (conj article-text-path :newsfeels.article/abstract)))))
+    (testing "both raw data and article text share correct publication date"
+      (is (= (:published_date complete-example-result) ;FIXME should be a parsed date, not a string
+             (get-in standardized (conj raw-article-path  :newsfeels.integrations.nytimes/published-date))
+             (get-in standardized (conj article-text-path :newsfeels.article/published-date)))))
+    (testing "raw article data contains correctly parsed list of adx keywords"
       (is (= ["Example Keyword1"
               "Example Keyword2"
               "Example Keyword3"]
-             (get standardized :newsfeels.integrations.nytimes/adx-keywords))))))
+             (get-in standardized (conj raw-article-path :newsfeels.integrations.nytimes/adx-keywords)))))))
