@@ -6,5 +6,6 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [cheshire "5.10.0"]
                  [clj-http "3.12.0"]
+                 [clojure.java-time "0.3.2"]
                  [com.stuartsierra/component "1.0.0"]]
   :repl-options {:init-ns newsfeels.core})

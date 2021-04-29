@@ -1,7 +1,8 @@
 (ns newsfeels.integrations.nytimes-test
   (:require
    [clojure.test :refer :all]
-   [newsfeels.integrations.nytimes :as nytimes]))
+   [newsfeels.integrations.nytimes :as nytimes]
+   [java-time :as time]))
 
 (deftest test-build-mostpopular-path
   (is (= "svc/mostpopular/v2/shared/1.json"
@@ -74,7 +75,21 @@
   (is (= correct-standardized-id
          (nytimes/build-article-id complete-example-result))))
 
-(deftest test-standardized-result
+(def correct-parsed-published-date
+  (time/local-date 2021 04 19))
+
+(deftest test-parse-published-date
+  (is (= correct-parsed-published-date
+         (nytimes/parse-published-date (:published_date complete-example-result)))))
+
+(def correct-parsed-updated-time
+  (time/instant "2021-04-21T17:43:28Z"))
+
+(deftest test-parse-updated-time
+  (is (= correct-parsed-updated-time
+         (nytimes/parse-updated-time (:updated complete-example-result)))))
+
+(deftest test-standardize-result
   (let [standardized (nytimes/standardize-result complete-example-result)]
     (testing "correct source"
       (is (= :nytimes
@@ -82,7 +97,7 @@
     (testing "correct id"
       (is (= correct-standardized-id
              (get standardized :newsfeels.article/id))))
-    (testing "title is used as headline in standard result, correctly stored in raw article data"
+    (testing "both raw data and article share correct title, article text uses it as the headline"
       (is (= (:title complete-example-result)
              (get standardized :newsfeels.article/headline)
              (get-in standardized [:newsfeels.article/raw-article-data :newsfeels.integrations.nytimes/title]))))
@@ -91,9 +106,12 @@
              (get standardized :newsfeels.article/abstract)
              (get-in standardized [:newsfeels.article/raw-article-data :newsfeels.integrations.nytimes/abstract]))))
     (testing "both raw data and article text share correct publication date"
-      (is (= (:published_date complete-example-result) ;FIXME should be a parsed date, not a string
+      (is (= correct-parsed-published-date 
              (get standardized :newsfeels.article/published-date)
              (get-in standardized [:newsfeels.article/raw-article-data :newsfeels.integrations.nytimes/published-date]))))
+    (testing "raw article data contains correctly parsed updated time"
+      (is (= correct-parsed-updated-time
+             (get-in standardized [:newsfeels.article/raw-article-data :newsfeels.integrations.nytimes/updated]))))
     (testing "raw article data contains correctly parsed list of adx keywords"
       (is (= ["Example Keyword1"
               "Example Keyword2"

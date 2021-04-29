@@ -2,7 +2,8 @@
   (:require
    [clj-http.client :as client]
    [clojure.string :as str]
-   [com.stuartsierra.component :as component]))
+   [com.stuartsierra.component :as component]
+   [java-time :as time]))
 
 (def popularity-measures
   {:emailed "emailed/"
@@ -31,10 +32,28 @@
          ".json")))
 
 (defn build-article-id
+  "Generates a unique id for the article"
   [raw-article-data]
   (let [{:keys [:uri]} raw-article-data
         sha (last (str/split uri #"/"))]
     (str "nytimes-" sha)))
+
+(defn parse-published-date
+  "Returns the published-date as a localdate,
+  without a time"
+  [published-date]
+  (let [[y m d] (into []
+                      (map clojure.edn/read-string)
+                      (str/split published-date #"-"))]
+    (time/local-date y m d)))
+
+(defn parse-updated-time
+  "Returns the updated-time as an inst,
+  assumes UTC"                          ;TODO what *is* the timezone of these timestamps?
+  [updated-time]
+  (let [[d t]
+        (str/split updated-time #" ")]
+    (time/instant (str d "T" t "Z"))))
 
 (defn standardize-result
   "Parses a single result from nytimes api, emits a parsed/standardized
@@ -65,19 +84,22 @@
                                                                           (str/replace "_" "-"))
                                                               new-k (keyword  (str "newsfeels.integrations.nytimes/" cleaned))]
                                                           [new-k v]))
-                                                      raw-article-data))]
+                                                      raw-article-data))
+        parsed-published-date (parse-published-date published_date)
+        parsed-updated-time (parse-updated-time updated)]
     ;; only the data relevant to downstream text analysis
     {:newsfeels.article/source :nytimes
      :newsfeels.article/id article-id
      :newsfeels.article/headline title
      :newsfeels.article/abstract abstract
-     ;; FIXME real time, not a string
-     :newsfeels.article/published-date published_date
+     :newsfeels.article/published-date parsed-published-date 
      ;; store everything we know, for safekeeping
      :newsfeels.article/raw-article-data
      (-> raw-article-data-standardized-keys
-         ;; FIXME parse the  time fields in here too (published-date, updated)
+         (assoc :newsfeels.integrations.nytimes/published-date parsed-published-date)
+         (assoc :newsfeels.integrations.nytimes/updated parsed-updated-time)
          (update :newsfeels.integrations.nytimes/adx-keywords #(str/split % #";")))}))
+
 
 (defn get-mostpopular-results 
   [client op-map]
