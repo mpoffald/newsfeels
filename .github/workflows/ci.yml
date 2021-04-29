@@ -15,9 +15,9 @@ jobs:
       - name: Cache Maven dependencies 
         uses: actions/cache@v2
         with:
-    	path: |
-    	  ~/.m2/repository
-        key: ${{ runner.os }}-${{ hashFiles('project.clj') }}
+    	  path: |
+	    ~/.m2/repository
+          key: ${{ runner.os }}-${{ hashFiles('project.clj') }}
 
       - name: Prepare java
         uses: actions/setup-java@v1
