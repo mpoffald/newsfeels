@@ -38,19 +38,18 @@
 
 (defn standardize-result
   "Parses a single result from nytimes api, emits a parsed/standardized
-  data map containing two submaps:
+  data map comprised of:
 
-   - newsfeels.article/raw-article-data: all the data from the result (minus irrelevant
-    image/media data and unused id fields), including nytimes-specific fields
-    and various metadata not directly used for text analysis 
-
-    plus a generated article-id and a source (nytimes)
-
-   - newsfeels.article/article-text: just fields necessary for downstream consumption/analysis:
+   - just fields necessary for downstream consumption/analysis:
      - text fields for analysis (headline, abstract)
      - publication date
      - news source (nytimes)
-     - the article's internal id (same as above)"
+     - the article's internal id
+   - newsfeels.article/raw-article-data:
+    map of all the data from the result (minus irrelevant
+    image/media data and unused id fields), including nytimes-specific fields
+    and various metadata not directly used for text analysis"
+  
   ;; FIXME add a field for the time the result was retrieved 
   [raw-article-data]
   (let [raw-article-data (dissoc raw-article-data
@@ -67,21 +66,18 @@
                                                               new-k (keyword  (str "newsfeels.integrations.nytimes/" cleaned))]
                                                           [new-k v]))
                                                       raw-article-data))]
-    {:newsfeels.article/article
-     {:newsfeels.article/raw-article-data
-      ;; store everything we know for safekeeping
-      (-> raw-article-data-standardized-keys
-          (assoc :newsfeels.article/source :nytimes)
-          (assoc :newsfeels.article/id article-id)
-          (update :newsfeels.integrations.nytimes/adx-keywords #(str/split % #";")))
-      ;; only the data relevant to downstream text analysis
-      :newsfeels.article/article-text
-      {:newsfeels.article/source :nytimes
-       :newsfeels.article/id article-id
-       :newsfeels.article/headline title
-       :newsfeels.article/abstract abstract
-       ;; FIXME real time, not a string
-       :newsfeels.article/published-date published_date}}}))
+    ;; only the data relevant to downstream text analysis
+    {:newsfeels.article/source :nytimes
+     :newsfeels.article/id article-id
+     :newsfeels.article/headline title
+     :newsfeels.article/abstract abstract
+     ;; FIXME real time, not a string
+     :newsfeels.article/published-date published_date
+     ;; store everything we know, for safekeeping
+     :newsfeels.article/raw-article-data
+     (-> raw-article-data-standardized-keys
+         ;; FIXME parse the  time fields in here too (published-date, updated)
+         (update :newsfeels.integrations.nytimes/adx-keywords #(str/split % #";")))}))
 
 (defn get-mostpopular-results 
   [client op-map]
