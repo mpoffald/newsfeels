@@ -13,3 +13,4 @@ pom.xml.asc
 secrets/*
 .#*
 config/config.edn
+scratch
