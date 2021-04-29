@@ -1,0 +1,2 @@
+{:nytimes
+ {:host "https://api.nytimes.com/"}}

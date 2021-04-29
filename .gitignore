@@ -12,5 +12,4 @@ pom.xml.asc
 .hg/
 secrets/*
 .#*
-config/config.edn
 scratch
