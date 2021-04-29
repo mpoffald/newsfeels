@@ -12,11 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Cache Maven dependencies 
+      - name: Cache local Maven repository
         uses: actions/cache@v2
         with:
-    	  path: ~/.m2/repository
-          key: ${{ runner.os }}-${{ hashFiles('project.clj') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('project.clj') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Prepare java
         uses: actions/setup-java@v1
