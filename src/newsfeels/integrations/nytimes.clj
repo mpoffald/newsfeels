@@ -101,7 +101,7 @@
 
 (defn get-most-viewed
   [client period]
-  (get-mostpopular-results client {:popuarity-type :viewed
+  (get-mostpopular-results client {:popularity-type :viewed
                                    :period period}))
 
 (defrecord NyTimesClient
