@@ -3,6 +3,8 @@
    [clj-http.client :as client]
    [clojure.string :as str]
    [com.stuartsierra.component :as component]
+   [taoensso.timbre :as timbre
+    :refer [info warn error]]
    [java-time :as time]))
 
 (def popularity-measures
@@ -11,11 +13,23 @@
    :viewed "viewed/"})
 
 (defn call-nytimes-api
+  "Makes a call to the nytimes api.
+  Returns the body when successful,
+  otherwise just logs info and returns nil."
   [client path]
   (let [{:keys [api-key host]} client
-        url (str host path)]
-    (client/get url {:as :json
-                     :query-params {"api-key" api-key}})))
+        url (str host path)
+        {:keys [:body :status] :as response} (client/get url {:as :json
+                                                              :query-params {"api-key" api-key}
+                                                              :throw-exceptions false})]
+    (cond
+      (= status 200) body
+      (>= status 500) (warn "Server error: " status
+                            "\n      Response body: " body) 
+      (>= status 400) (error "Client error: " status
+                             "\n     Response body: " body)
+      :else (info "Something happened: " status
+                  "\n     Response body: " body))))
 
 (defn build-mostpopular-path
   [op-map]
@@ -102,15 +116,17 @@
 
 
 (defn get-mostpopular-results 
+  "Requests article data from nytimes
+  Most Popular api, returns list of results (articles)
+  if successful."
   [client op-map]
   (let [path (build-mostpopular-path op-map)
-        response (call-nytimes-api client path)]
-    (when (= 200 (:status response))  ;TODO log/warn non-200 responses
-      (get-in response [:body :results]))))
+        {:keys [results]} (call-nytimes-api client path)]
+    results))
 
 (defn get-most-emailed
   [client period]
-  (get-mostpopular-results client {:popularity-type :emailed
+  (get-mostpopular-results client {:popularity-measure :emailed
                                    :period period}))
 
 (defn get-most-shared
@@ -123,7 +139,7 @@
 
 (defn get-most-viewed
   [client period]
-  (get-mostpopular-results client {:popularity-type :viewed
+  (get-mostpopular-results client {:popularity-measure :viewed
                                    :period period}))
 
 (defrecord NyTimesClient
