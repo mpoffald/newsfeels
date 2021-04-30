@@ -147,14 +147,14 @@
     component/Lifecycle
 
     (start [component]
-      (println "Starting NyTimesClient")
+      (info "Starting NyTimesClient")
 
       (let [{:keys [api-key]}
             (clojure.edn/read-string (slurp "secrets/secrets.edn"))] ;TODO do this better
         (assoc component :api-key api-key)))
 
     (stop [component]
-      (println "Stopping NyTimesClient")
+      (info "Stopping NyTimesClient")
       (assoc component :api-key nil)))
 
 (defn nytimes-client
