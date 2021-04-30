@@ -1,6 +1,7 @@
 (ns newsfeels.integrations.nytimes-test
   (:require
    [clojure.test :refer :all]
+   [com.stuartsierra.component :as component]
    [newsfeels.integrations.nytimes :as nytimes]
    [java-time :as time]))
 
@@ -117,3 +118,23 @@
               "Example Keyword2"
               "Example Keyword3"]
              (get-in standardized [:newsfeels.article/raw-article-data :newsfeels.integrations.nytimes/adx-keywords]))))))
+
+
+
+;; TODO: might want to stub this out instead of calling the real api
+(deftest ^:integration test-nytimes
+  (let [config (clojure.edn/read-string (slurp "config/config.edn"))
+        test-system (component/system-map
+                     :nytimes (nytimes/nytimes-client (:nytimes config)))
+        started (component/start test-system)
+        client (:nytimes started)]
+    (try
+      (testing "most viewed"
+        (is (nytimes/get-most-viewed client 1)))
+      (testing "most emailed"
+        (is (nytimes/get-most-emailed client 1)))
+      (testing "most shared, any type"
+        (is (nytimes/get-most-shared client 1)))
+      (testing "most shared via facebook"
+        (is (nytimes/get-most-shared client 1 "facebook")))
+      (finally (component/stop started)))))

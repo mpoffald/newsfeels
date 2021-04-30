@@ -9,4 +9,7 @@
                  [clojure.java-time "0.3.2"]
                  [com.stuartsierra/component "1.0.0"]
                  [com.taoensso/timbre "5.1.2"]]
+  :test-selectors {:default (complement :integration)
+                   :all (constantly true)
+                   :integration :integration}
   :repl-options {:init-ns newsfeels.core})
