@@ -17,5 +17,4 @@
 
 (defn stop! []
   (alter-var-root #'system component/stop)
-  
   nil)
