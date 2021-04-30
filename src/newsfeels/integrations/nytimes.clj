@@ -17,10 +17,10 @@
   Returns the body when successful,
   otherwise just logs info and returns nil."
   [client path]
-  (let [{:keys [api-key host]} client
+  (let [{:keys [api-key-fn host]} client
         url (str host path)
         {:keys [:body :status] :as response} (client/get url {:as :json
-                                                              :query-params {"api-key" api-key}
+                                                              :query-params {"api-key" (api-key-fn)}
                                                               :throw-exceptions false})]
     (cond
       (= status 200) body
@@ -151,11 +151,11 @@
 
       (let [{:keys [api-key]}
             (clojure.edn/read-string (slurp "secrets/secrets.edn"))] ;TODO do this better
-        (assoc component :api-key api-key)))
+        (assoc component :api-key-fn (constantly api-key))))         ;TODO find a nicer way to hide secrets from stacktraces
 
     (stop [component]
       (info "Stopping NyTimesClient")
-      (assoc component :api-key nil)))
+      (assoc component :api-key-fn nil)))
 
 (defn nytimes-client
   [config]
