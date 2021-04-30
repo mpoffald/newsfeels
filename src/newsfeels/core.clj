@@ -9,12 +9,13 @@
     (component/system-map
      :nytimes (nytimes/nytimes-client (get config :nytimes)))))
 
-(def current-system (system))
+(def system (system))
 
 (defn start! []
-  (alter-var-root #'current-system component/start)
+  (alter-var-root #'system component/start)
   nil)
 
 (defn stop! []
-  (alter-var-root #'current-system component/stop)
+  (alter-var-root #'system component/stop)
+  
   nil)
