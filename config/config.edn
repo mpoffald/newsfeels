@@ -1,2 +1,4 @@
 {:nytimes
- {:host "https://api.nytimes.com/"}}
+ {:host "https://api.nytimes.com/"}
+ :afinn
+ {:lexicon-file "resources/AFINN-111.edn"}}
