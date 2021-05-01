@@ -52,23 +52,19 @@
                                    ""))))
                               split-word-ls)]
     ;; Look for special two-word phrases to be treated as single words
-    (loop [word-ls (rest cleaned-word-ls) 
-           word1 (first cleaned-word-ls)
+    (loop [word-ls cleaned-word-ls 
            final-ls []]
       (cond
         (empty? word-ls) final-ls
-       :else 
-        (let [word2 (first word-ls)
-              possible-special-phrase (str word1 " " word2)]
-          (if (contains? special-phrases possible-special-phrase)
-            (recur (drop 2 word-ls)
-                   (second word-ls)
-                   (conj final-ls possible-special-phrase))
-            (recur (rest word-ls) 
-                   (first word-ls)
-                   (if (= 1 (count word-ls))
-                     (conj final-ls word1 word2)
-                     (conj final-ls word1)))))))))
+        (= 1 (count word-ls)) (conj final-ls (first word-ls))
+        :else (let [word1 (first word-ls)
+                    word2 (second word-ls)
+                    possible-special-phrase (str word1 " " word2)]
+                (if (contains? special-phrases possible-special-phrase)
+                  (recur (drop 2 word-ls)
+                         (conj final-ls possible-special-phrase))
+                  (recur (rest word-ls) 
+                         (conj final-ls word1))))))))
 
 (defrecord Afinn
     []
