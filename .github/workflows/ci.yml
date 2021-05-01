@@ -33,5 +33,13 @@ jobs:
       - name: Get leiningen version
         run: lein -v
 
+      - name: Write secrets file
+        env:
+          SECRETS: ${{ secrets.SECRETS_EDN }}
+        run: |
+	  mkdir -p secrets
+	  rm -f secrets/secrets.edn
+          echo "$SECRETS" > secrets/secrets.edn
+
       - name: Run tests
         run: lein test :all
