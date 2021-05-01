@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-  clojure:
+  Test:
 
     runs-on: ubuntu-latest
 
