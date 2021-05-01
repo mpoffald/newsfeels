@@ -1,11 +1,12 @@
 (ns newsfeels.core
   (:require
    [com.stuartsierra.component :as component]
+   [newsfeels.utils :as utils]
    [newsfeels.integrations.nytimes :as nytimes]))
 
 (defn system
   []
-  (let [config (clojure.edn/read-string (slurp "config/config.edn"))]
+  (let [config (utils/get-config)]
     (component/system-map
      :nytimes (nytimes/nytimes-client (get config :nytimes)))))
 
