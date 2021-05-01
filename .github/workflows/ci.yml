@@ -37,8 +37,8 @@ jobs:
         env:
           SECRETS: ${{ secrets.SECRETS_EDN }}
         run: |
-	  mkdir -p secrets
-	  rm -f secrets/secrets.edn
+          mkdir -p secrets
+          rm -f secrets/secrets.edn
           echo "$SECRETS" > secrets/secrets.edn
 
       - name: Run tests
