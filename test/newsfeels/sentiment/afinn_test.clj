@@ -37,3 +37,23 @@
       (is (= ["i" "guess" "i" "dont" "mind" "so" "much"
               "i" "cant" "be" "too" "mad"]
              (afinn/clean-text not-special))))))
+
+(def mini-lexicon {"outstanding" 5 
+                   "superb" 5
+                   "best" 3
+                   "love" 3
+                   "dont like" -2
+                   "cant stand" -3
+                   "terrible" -3
+                   "worst" -3})
+
+(deftest test-calculate-valence
+  (let [very-negative ["everything" "is" "terrible" "and" "i" "dont like" "it" "its" "the" "worst"]
+        very-positive ["everything" "is" "outstanding" "and" "i" "love" "it" "its" "the" "best"]
+        neutral ["everything" "is" "okay" "dont like" "terrible" "superb"]]
+    (is (= -8
+           (afinn/calculate-valence mini-lexicon very-negative)))
+    (is (= 11
+           (afinn/calculate-valence mini-lexicon very-positive)))
+    (is (= 0
+           (afinn/calculate-valence mini-lexicon neutral)))))

@@ -1,6 +1,6 @@
 (ns newsfeels.sentiment.afinn
   "Component that performs cleaning and sentiment analysis
-  of text using the AFINN-111 lexicon"
+  of cleaned-word-list using the AFINN-111 lexicon"
   (:require
    [com.stuartsierra.component :as component]
    [clojure.string :as str]
@@ -25,11 +25,11 @@
   "[!.,;:*?&$]")
 
 
-(defn clean-text
+(defn clean-cleaned-word-list
   "Given a string, returns list of individual words
   without capitalization or punctuation"
-  [text-str]
-  (let [split-word-ls (-> text-str
+  [cleaned-word-list-str]
+  (let [split-word-ls (-> cleaned-word-list-str
                           ;; remove leading/trailing whitespace
                           (str/trim)
                           ;; all lower case
@@ -65,6 +65,15 @@
                          (conj final-ls possible-special-phrase))
                   (recur (rest word-ls) 
                          (conj final-ls word1))))))))
+
+(defn calculate-valence
+  "Calculates the valence for a single piece of cleaned text"
+  [lexicon cleaned-word-list]
+  (let [freq (frequencies cleaned-word-list)]
+    (apply + (map (fn [word]
+                    (* (or (get lexicon word) 0)
+                       (get freq word)))
+                  cleaned-word-list))))
 
 (defrecord Afinn
     []
