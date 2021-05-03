@@ -22,7 +22,7 @@
 (def special-characters-split-trim-re
   "punctuation marks and special characters
   that should be removed, and used to split words."
-  "[!.,;:*?&$]")
+  "[%!.,;:*?&$“]")
 
 
 (defn clean-text
@@ -74,6 +74,26 @@
                     (* (or (get lexicon word) 0)
                        (get freq word)))
                   cleaned-word-list))))
+
+(defn assoc-all-valence-scores
+  [afinn articles]
+  (let [lexicon (-> afinn
+                    (:lexicon)
+                    (deref))
+        clean-and-calculate (fn [text]
+                              (calculate-valence
+                               lexicon
+                               (clean-text text)))]
+    (into []
+          (map (fn [article]
+                 (let [{:keys [:newsfeels.article/headline
+                               :newsfeels.article/abstract]} article
+                       headline-score (clean-and-calculate headline)
+                       abstract-score (clean-and-calculate abstract)]
+                   (-> article
+                       (assoc :newsfeels.sentiment.afinn/headline-score headline-score)
+                       (assoc :newsfeels.sentiment.afinn/abstract-score abstract-score)))))
+          articles)))
 
 (defrecord Afinn
     []

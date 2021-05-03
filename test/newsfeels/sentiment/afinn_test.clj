@@ -1,6 +1,7 @@
 (ns newsfeels.sentiment.afinn-test
   (:require
    [clojure.test :refer :all]
+   [com.stuartsierra.component :as component]
    [newsfeels.sentiment.afinn :as afinn]))
 
 (deftest test-clean-text
@@ -9,7 +10,7 @@
       (is (= ["a" "b" "c" "d" "e" "f"]
              (afinn/clean-text whitespaced)))))
   (testing "removes and splits on punctuation"
-    (let [punctuated "a..b,; c! d? e&* $f:g"]
+    (let [punctuated "a%..b“,; c! d? e&* $f:g"]
       (is (= ["a" "b" "c" "d" "e" "f" "g"]
              (afinn/clean-text punctuated)))))
   (testing "removes apostrophes and hyphens, leaving word intact"
@@ -57,3 +58,46 @@
            (afinn/calculate-valence mini-lexicon very-positive)))
     (is (= 0
            (afinn/calculate-valence mini-lexicon neutral)))))
+
+(def example-articles
+  [{:newsfeels.article/id
+    "news-1"
+    :newsfeels.article/headline
+    "Everything is Awesome! According to Random Person"
+    :newsfeels.article/abstract
+    "Some people are actually pretty optimistic about life. These people are generally pretty happy and probably don't check the news very often."}
+   {:newsfeels.article/id
+    "news-2"
+    :newsfeels.article/headline
+    "Clickbait Headline About Life Being Terrible."
+    :newsfeels.article/abstract
+    "We really want you to think there's been some kind of catastrophic disaster. Bet you can't stand the suspense!"}
+   {:newsfeels.article/id
+    "news-3"
+    :newsfeels.article/headline
+    "Cheerful Fluff Piece About Something Pleasant"
+    :newsfeels.article/abstract
+    "Did you know puppies are adorable? According to polls, 78% of people agree with the statement: “I don't like tragedy but I do like puppies.“"}])
+
+(deftest ^:integration test-afinn
+  (let [config {:afinn {:lexicon-file "test/resources/test-lexicon.edn"}} 
+        test-system (component/system-map
+                     :afinn (afinn/afinn (:afinn config)))
+        started (component/start test-system)
+        afinn (:afinn started)]
+    (try
+      (let [scored-articles (afinn/assoc-all-valence-scores afinn example-articles)]
+        (is (= [{:newsfeels.article/id "news-1"
+                 :newsfeels.sentiment.afinn/headline-score 4
+                 :newsfeels.sentiment.afinn/abstract-score 9}
+                {:newsfeels.article/id "news-2"
+                 :newsfeels.sentiment.afinn/headline-score -3
+                 :newsfeels.sentiment.afinn/abstract-score -8}
+                {:newsfeels.article/id "news-3"
+                 :newsfeels.sentiment.afinn/headline-score 5
+                 :newsfeels.sentiment.afinn/abstract-score 2} ]
+               (into [] (map #(select-keys % [:newsfeels.article/id
+                                              :newsfeels.sentiment.afinn/headline-score
+                                              :newsfeels.sentiment.afinn/abstract-score]))
+                     scored-articles))))
+      (finally (component/stop started)))))
