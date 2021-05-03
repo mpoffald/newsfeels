@@ -58,7 +58,7 @@
   without a time"
   [published-date]
   (let [[y m d] (into []
-                      (map clojure.edn/read-string)
+                      (map #(Integer/parseInt %))
                       (str/split published-date #"-"))]
     (time/local-date y m d)))
 
@@ -123,7 +123,8 @@
   [client op-map]
   (let [path (build-mostpopular-path op-map)
         {:keys [results]} (call-nytimes-api client path)]
-    (into [] (map standardize-result) results)))
+    results
+    #_(into [] (map standardize-result) results)))
 
 
 (defn get-most-emailed

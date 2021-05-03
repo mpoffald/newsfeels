@@ -24,7 +24,7 @@
 (def complete-example-result
   {:org_facet [],
    :geo_facet [],
-   :published_date "2021-04-19",
+   :published_date "2021-08-19",
    :updated "2021-04-21 17:43:28",
    :section "Well",
    :abstract "Brief one or two sentence description of article contents.",
@@ -77,7 +77,7 @@
          (nytimes/build-article-id complete-example-result))))
 
 (def correct-parsed-published-date
-  (time/local-date 2021 04 19))
+  (time/local-date 2021 8 19))
 
 (deftest test-parse-published-date
   (is (= correct-parsed-published-date
