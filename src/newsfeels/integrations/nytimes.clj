@@ -123,8 +123,7 @@
   [client op-map]
   (let [path (build-mostpopular-path op-map)
         {:keys [results]} (call-nytimes-api client path)]
-    results
-    #_(into [] (map standardize-result) results)))
+    (into [] (map standardize-result) results)))
 
 
 (defn get-most-emailed
