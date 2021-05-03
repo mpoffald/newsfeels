@@ -2,15 +2,17 @@
   (:require
    [com.stuartsierra.component :as component]
    [newsfeels.utils :as utils]
-   [newsfeels.integrations.nytimes :as nytimes]))
+   [newsfeels.integrations.nytimes :as nytimes]
+   [newsfeels.sentiment.afinn :as afinn]))
 
-(defn system
+(defn make-system
   []
   (let [config (utils/get-config)]
     (component/system-map
+     :afinn (afinn/afinn (get config :afinn))
      :nytimes (nytimes/nytimes-client (get config :nytimes)))))
 
-(def system (system))
+(def system (make-system))
 
 (defn start! []
   (alter-var-root #'system component/start)
