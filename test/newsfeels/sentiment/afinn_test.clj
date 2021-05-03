@@ -13,30 +13,31 @@
     (let [punctuated "a%..b“,; c! d? e&* $f:g"]
       (is (= ["a" "b" "c" "d" "e" "f" "g"]
              (afinn/clean-text punctuated)))))
-  (testing "removes apostrophes and hyphens, leaving word intact"
-    (let [special-punctuation "can't it's win-win"]
-      (is (= ["cant" "its" "winwin"]
+  (testing "removes apostrophes but not hyphens"
+    (let [special-punctuation "can't it's self-deluded"]
+      (is (= ["cant" "its" "self-deluded"]
              (afinn/clean-text special-punctuation)))))
   (testing "standardizes to lower-case"
     (let [mixed-case "Aa Bb cC"]
       (is (= ["aa" "bb" "cc"]
              (afinn/clean-text mixed-case)))))
   (testing "keeps special phrases intact"
-    (let [special "I can't stand data preprocessing. I don't like all the edge cases"
-          special-odd "Sometimes you have to do things you don't like"
-          special-even "Blah Blah don't like! Can't stand!"]
+    (let [special1 "I can't stand data preprocessing. I don't like all the edge cases"
+          special2 "Sometimes you have to do things you don't like"
+          special3 "Blah Blah don't like! Can't stand! Does not work."]
       (is (= ["i" "cant stand" "data" "preprocessing"
               "i" "dont like" "all" "the" "edge" "cases"]
-             (afinn/clean-text special)))
+             (afinn/clean-text special1)))
       (is (= ["sometimes" "you" "have" "to" "do" "things"
               "you" "dont like"]
-             (afinn/clean-text special-odd)))
-      (is (= ["blah" "blah" "dont like" "cant stand"]
-             (afinn/clean-text special-even)))))
+             (afinn/clean-text special2)))
+      (is (= ["blah" "blah" "dont like" "cant stand" "does not work"]
+             (afinn/clean-text special3)))))
   (testing "no false positives for special phrases"
-    (let [not-special "I guess I don't mind so much. I can't be too mad!"]
+    (let [not-special "I guess I don't mind so much. I can't be too mad. Sometimes it does work"]
       (is (= ["i" "guess" "i" "dont" "mind" "so" "much"
-              "i" "cant" "be" "too" "mad"]
+              "i" "cant" "be" "too" "mad" "sometimes" "it"
+              "does" "work"]
              (afinn/clean-text not-special))))))
 
 (def mini-lexicon {"outstanding" 5 

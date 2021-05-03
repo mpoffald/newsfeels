@@ -10,14 +10,27 @@
 (def special-phrases
   "The only multi-word phrases in the AFINN-111 lexicon.
   These need to be kept intact and treated as one word
-  in analysis  "
+  in analysis"
   #{"cant stand"
+    "cashing in"
+    "cool stuff"
+    "does not work"
+    "fed up"
+    "green wash"
+    "green washing"
+    "messing up"
+    "no fun"
+    "not good"
+    "not working"
+    "right direction"
+    "screwed up"
+    "some kind"
     "dont like"})
 
 (def special-punctuation-to-remove
   "punctuation marks that should be removed,
   but not be used to split words, eg can't -> cant"
-  "[-']")
+  "[']")
 
 (def special-characters-split-trim-re
   "punctuation marks and special characters
@@ -27,7 +40,10 @@
 
 (defn clean-text
   "Given a string, returns list of individual words
-  without capitalization or punctuation"
+  without capitalization or punctuation.
+
+  Keeps special phrases (multi-word phrases
+  that need to be treated as one word) intact."
   [text-str]
   (let [split-word-ls (-> text-str
                           ;; remove leading/trailing whitespace
@@ -51,7 +67,7 @@
                                    (re-pattern special-punctuation-to-remove)
                                    ""))))
                               split-word-ls)]
-    ;; Look for special two-word phrases to be treated as single words
+    ;; Look for special two- and three-word phrases to be treated as single words
     (loop [word-ls cleaned-word-ls 
            final-ls []]
       (cond
@@ -59,10 +75,20 @@
         (= 1 (count word-ls)) (conj final-ls (first word-ls))
         :else (let [word1 (first word-ls)
                     word2 (second word-ls)
-                    possible-special-phrase (str word1 " " word2)]
-                (if (contains? special-phrases possible-special-phrase)
+                    word3 (second (rest word-ls))
+                    possible-two-word-special-phrase (str word1 " " word2)
+                    possible-three-word-special-phrase (some->> word3
+                                                                (str possible-two-word-special-phrase " "))]
+                (cond
+                  (contains? special-phrases possible-two-word-special-phrase)
                   (recur (drop 2 word-ls)
-                         (conj final-ls possible-special-phrase))
+                         (conj final-ls possible-two-word-special-phrase))
+
+                  (contains? special-phrases possible-three-word-special-phrase)
+                  (recur (drop 3 word-ls)
+                         (conj final-ls possible-three-word-special-phrase))
+
+                  :else
                   (recur (rest word-ls) 
                          (conj final-ls word1))))))))
 
