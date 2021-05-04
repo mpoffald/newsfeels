@@ -2,6 +2,17 @@
 
 Basic sentiment analysis for news headlines.
 
+Get headlines and abstracts for the New York Times' most popular articles, and see their valence as scored by the [AFINN-111](http://corpustext.com/reference/sentiment_afinn.html) lexicon.
+
+## Setup
+
+You'll need an API key for the New York Times (get one [here](https://developer.nytimes.com/)), authorized for the [Most Popular API](https://developer.nytimes.com/docs/most-popular-product/1/overview), in your ```secrets.edn``` file, like so:
+
+```clj
+;; in secrets/secrets.edn:
+{:api-key "YOUR_API_KEY_HERE"}
+```
+
 ## Usage
 
 ```
