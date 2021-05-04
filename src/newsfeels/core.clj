@@ -32,21 +32,26 @@
   (try
     (let [{:keys [afinn nytimes]} system
           most-viewed-articles (nytimes/get-most-viewed nytimes 1)
-          scored-articles (afinn/assoc-all-valence-scores afinn most-viewed-articles)]
+          scored-articles (afinn/assoc-all-valence-scores afinn most-viewed-articles)
+          source-str "Source"
+          headline-str "Headline"
+          headline-valence-str "Headline Valence"
+          abstract-valence-str "Abstract Valence"
+          total-valence-str "Total Valence"]
       (println "Most-Viewed Articles in the Last 24 Hours:")
-      (pprint/print-table ["Source" "Headline" "Headline Valence" "Abstract Valence" "Total Valence"]
-                          (sort-by #(get % "Total Valence")
+      (pprint/print-table [source-str headline-str headline-valence-str abstract-valence-str total-valence-str]
+                          (sort-by #(get % total-valence-str)
                                    (map (comp
-                                         (fn [article] (assoc article "Total Valence" (+ (get article "Headline Valence")
-                                                                                         (get article "Abstract Valence"))))
-                                         (fn [article] (update article "Headline" #(if (<= (count %) 80)
+                                         (fn [article] (assoc article total-valence-str (+ (get article headline-valence-str)
+                                                                                         (get article abstract-valence-str))))
+                                         (fn [article] (update article headline-str #(if (<= (count %) 80)
                                                                                      %
                                                                                      (str (subs % 0 77) "..."))))
                                          (fn [article] (clojure.set/rename-keys article 
-                                                                                {:newsfeels.article/source "Source"
-                                                                                 :newsfeels.article/headline "Headline"
-                                                                                 :newsfeels.sentiment.afinn/headline-score "Headline Valence"
-                                                                                 :newsfeels.sentiment.afinn/abstract-score "Abstract Valence"})))
+                                                                                {:newsfeels.article/source source-str
+                                                                                 :newsfeels.article/headline headline-str
+                                                                                 :newsfeels.sentiment.afinn/headline-score headline-valence-str
+                                                                                 :newsfeels.sentiment.afinn/abstract-score abstract-valence-str})))
                                         scored-articles))))
     (finally (stop!))))
 
