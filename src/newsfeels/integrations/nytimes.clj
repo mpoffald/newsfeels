@@ -144,20 +144,19 @@
   (get-mostpopular-results client {:popularity-measure :viewed
                                    :period period}))
 
-(defrecord NyTimesClient
-    []
-    component/Lifecycle
+(defrecord NyTimesClient []
+  component/Lifecycle
 
-    (start [component]
-      (info "Starting NyTimesClient")
+  (start [component]
+    (info "Starting NyTimesClient")
 
-      (let [{:keys [api-key]}
-            (utils/prepare-secrets)] ;TODO do this better
-        (assoc component :api-key api-key)))
+    (let [{:keys [api-key]}
+          (utils/prepare-secrets)]    ;TODO do this better
+      (assoc component :api-key api-key)))
 
-    (stop [component]
-      (info "Stopping NyTimesClient")
-      (assoc component :api-key nil)))
+  (stop [component]
+    (info "Stopping NyTimesClient")
+    (assoc component :api-key nil)))
 
 (defn nytimes-client
   [config]

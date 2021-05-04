@@ -121,21 +121,19 @@
                        (assoc :newsfeels.sentiment.afinn/abstract-score abstract-score)))))
           articles)))
 
-(defrecord Afinn
-    []
+(defrecord Afinn []
+  component/Lifecycle
 
-    component/Lifecycle
+  (start [component]
+    (info "Starting Afinn")
 
-    (start [component]
-      (info "Starting Afinn")
+    (let [{:keys [lexicon-file]} component
+          lexicon (clojure.edn/read-string (slurp lexicon-file))]
+      (assoc component :lexicon (atom lexicon))))
 
-      (let [{:keys [lexicon-file]} component
-            lexicon (clojure.edn/read-string (slurp lexicon-file))]
-        (assoc component :lexicon (atom lexicon))))
-
-    (stop [component]
-      (info "Stopping Afinn")
-      (assoc component :lexicon nil)))
+  (stop [component]
+    (info "Stopping Afinn")
+    (assoc component :lexicon nil)))
 
 (defn afinn
   [config]
