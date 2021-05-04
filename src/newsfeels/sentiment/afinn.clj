@@ -67,19 +67,21 @@
            final-ls []]
       (cond
         (empty? word-ls) final-ls
-        (= 1 (count word-ls)) (conj final-ls (first word-ls))
+        
         :else (let [[word1 word2 word3] word-ls
-                    possible-two-word-special-phrase (str word1 " " word2)
+                    possible-two-word-special-phrase (some->> word2
+                                                              (str word1 " "))
                     possible-three-word-special-phrase (some->> word3
                                                                 (str possible-two-word-special-phrase " "))]
                 (cond
-                  (contains? special-phrases possible-two-word-special-phrase)
-                  (recur (drop 2 word-ls)
-                         (conj final-ls possible-two-word-special-phrase))
-
+                  ;; We assume longer phrases take precedence over shorter ones
                   (contains? special-phrases possible-three-word-special-phrase)
                   (recur (drop 3 word-ls)
                          (conj final-ls possible-three-word-special-phrase))
+
+                  (contains? special-phrases possible-two-word-special-phrase)
+                  (recur (drop 2 word-ls)
+                         (conj final-ls possible-two-word-special-phrase))
 
                   :else
                   (recur (rest word-ls) 
