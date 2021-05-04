@@ -49,7 +49,7 @@ Most-Viewed Articles in the Last 24 Hours:
 
 ## License
 
-Copyright © 2021 FIXME
+Copyright © 2021 Marcela Poffald
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
