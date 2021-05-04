@@ -28,15 +28,15 @@
     "some kind"
     "dont like"})
 
-(def special-punctuation-to-remove
+(def collapse-characters-re 
   "punctuation marks that should be removed,
   but not be used to split words, eg can't -> cant"
-  "[']")
+  #"[']")
 
-(def special-characters-split-trim-re
-  "punctuation marks and special characters
+(def split+trim-characters-re
+  "punctuation marks and characters
   that should be removed, and used to split words."
-  "[%!.,;:*?&$“]")
+  #"\s+|[%!.,;:*?&$“]")
 
 
 (defn clean-text
@@ -52,10 +52,7 @@
                           ;; all lower case
                           (str/lower-case)
                           ;; split on whitespace and special characters
-                          (str/split (re-pattern
-                                      (str "\\s+"
-                                           "|"
-                                           special-characters-split-trim-re))))
+                          (str/split split+trim-characters-re))
         cleaned-word-ls (into []
                               (comp
                                ;; get rid of all the empty strings
@@ -63,10 +60,7 @@
                                ;; remove the punctuation that isn't for splitting
                                (map
                                 (fn [word]
-                                  (str/replace
-                                   word
-                                   (re-pattern special-punctuation-to-remove)
-                                   ""))))
+                                  (str/replace word collapse-characters-re ""))))
                               split-word-ls)]
     ;; Look for special two- and three-word phrases to be treated as single words
     (loop [word-ls cleaned-word-ls 
@@ -74,9 +68,7 @@
       (cond
         (empty? word-ls) final-ls
         (= 1 (count word-ls)) (conj final-ls (first word-ls))
-        :else (let [word1 (first word-ls)
-                    word2 (second word-ls)
-                    word3 (second (rest word-ls))
+        :else (let [[word1 word2 word3] word-ls
                     possible-two-word-special-phrase (str word1 " " word2)
                     possible-three-word-special-phrase (some->> word3
                                                                 (str possible-two-word-special-phrase " "))]
