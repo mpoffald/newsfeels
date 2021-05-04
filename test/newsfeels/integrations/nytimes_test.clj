@@ -3,6 +3,7 @@
    [clojure.test :refer :all]
    [com.stuartsierra.component :as component]
    [newsfeels.integrations.nytimes :as nytimes]
+   [newsfeels.utils :as utils]
    [java-time :as time]))
 
 (deftest test-build-mostpopular-path
@@ -123,7 +124,7 @@
 
 ;; TODO: might want to stub this out instead of calling the real api
 (deftest ^:integration test-nytimes
-  (let [config (clojure.edn/read-string (slurp "config/config.edn"))
+  (let [config (utils/get-config)
         test-system (component/system-map
                      :nytimes (nytimes/nytimes-client (:nytimes config)))
         started (component/start test-system)

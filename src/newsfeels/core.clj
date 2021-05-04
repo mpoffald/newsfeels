@@ -2,6 +2,7 @@
   (:require
    [com.stuartsierra.component :as component]
    [clojure.pprint :as pprint]
+   [clojure.set :as set]
    [newsfeels.utils :as utils]
    [newsfeels.integrations.nytimes :as nytimes]
    [newsfeels.sentiment.afinn :as afinn])
@@ -43,15 +44,15 @@
                           (sort-by #(get % total-valence-str)
                                    (map (comp
                                          (fn [article] (assoc article total-valence-str (+ (get article headline-valence-str)
-                                                                                         (get article abstract-valence-str))))
+                                                                                           (get article abstract-valence-str))))
                                          (fn [article] (update article headline-str #(if (<= (count %) 80)
-                                                                                     %
-                                                                                     (str (subs % 0 77) "..."))))
-                                         (fn [article] (clojure.set/rename-keys article 
-                                                                                {:newsfeels.article/source source-str
-                                                                                 :newsfeels.article/headline headline-str
-                                                                                 :newsfeels.sentiment.afinn/headline-score headline-valence-str
-                                                                                 :newsfeels.sentiment.afinn/abstract-score abstract-valence-str})))
+                                                                                       %
+                                                                                       (str (subs % 0 77) "..."))))
+                                         (fn [article] (set/rename-keys article 
+                                                                        {:newsfeels.article/source source-str
+                                                                         :newsfeels.article/headline headline-str
+                                                                         :newsfeels.sentiment.afinn/headline-score headline-valence-str
+                                                                         :newsfeels.sentiment.afinn/abstract-score abstract-valence-str})))
                                         scored-articles))))
     (finally (stop!))))
 

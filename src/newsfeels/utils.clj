@@ -1,6 +1,7 @@
 (ns newsfeels.utils
   (:require
    [clojure.edn :as edn]))
+;; TODO should there be a component for secrets and/or config?
 
 (defn get-config
   []

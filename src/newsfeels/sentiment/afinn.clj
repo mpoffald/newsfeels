@@ -3,6 +3,7 @@
   of text using the AFINN-111 lexicon"
   (:require
    [com.stuartsierra.component :as component]
+   [clojure.edn :as edn]
    [clojure.string :as str]
    [taoensso.timbre :as timbre
     :refer [info warn error]]))
@@ -126,7 +127,7 @@
     (info "Starting Afinn")
 
     (let [{:keys [lexicon-file]} component
-          lexicon (clojure.edn/read-string (slurp lexicon-file))]
+          lexicon (edn/read-string (slurp lexicon-file))]
       (assoc component :lexicon (atom lexicon))))
 
   (stop [component]
