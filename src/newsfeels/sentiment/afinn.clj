@@ -95,11 +95,9 @@
 (defn calculate-valence
   "Calculates the valence for a single piece of cleaned text"
   [lexicon cleaned-word-list]
-  (let [freq (frequencies cleaned-word-list)]
-    (apply + (map (fn [word]
-                    (* (or (get lexicon word) 0)
-                       (get freq word)))
-                  cleaned-word-list))))
+  (apply + (map (fn [word]
+                  (or (get lexicon word) 0))
+                cleaned-word-list)))
 
 (defn assoc-all-valence-scores
   [afinn articles]

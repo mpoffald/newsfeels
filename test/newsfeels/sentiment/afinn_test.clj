@@ -72,7 +72,7 @@
     :newsfeels.article/headline
     "Clickbait Headline About Life Being Terrible."
     :newsfeels.article/abstract
-    "We really want you to think there's been some kind of catastrophic disaster. Bet you can't stand the suspense!"}
+    "We really want you to think there's been some kind of catastrophic disaster. Bet you can't stand the suspense! Can't stand!"}
    {:newsfeels.article/id
     "news-3"
     :newsfeels.article/headline
@@ -90,10 +90,10 @@
       (let [scored-articles (afinn/assoc-all-valence-scores afinn example-articles)]
         (is (= [{:newsfeels.article/id "news-1"
                  :newsfeels.sentiment.afinn/headline-score 4
-                 :newsfeels.sentiment.afinn/abstract-score 9}
+                 :newsfeels.sentiment.afinn/abstract-score 7}
                 {:newsfeels.article/id "news-2"
                  :newsfeels.sentiment.afinn/headline-score -3
-                 :newsfeels.sentiment.afinn/abstract-score -8}
+                 :newsfeels.sentiment.afinn/abstract-score -11}
                 {:newsfeels.article/id "news-3"
                  :newsfeels.sentiment.afinn/headline-score 5
                  :newsfeels.sentiment.afinn/abstract-score 2} ]
