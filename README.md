@@ -6,7 +6,9 @@ Get headlines and abstracts for the New York Times' most popular articles, and s
 
 ## Setup
 
-You'll need an API key for the New York Times (get one [here](https://developer.nytimes.com/)), authorized for the [Most Popular API](https://developer.nytimes.com/docs/most-popular-product/1/overview), in your ```secrets.edn``` file, like so:
+1. Get an [API key for the New York Times](https://developer.nytimes.com/), and enable the [Most Popular API](https://developer.nytimes.com/docs/most-popular-product/1/overview).
+
+2. In the ```secrets``` directory, copy ```example-secrets.edn``` into a file called ```secrets.edn```, and add in your API key:
 
 ```clj
 ;; in secrets/secrets.edn:

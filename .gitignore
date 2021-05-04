@@ -11,5 +11,6 @@ pom.xml.asc
 .hgignore
 .hg/
 secrets/*
+!secrets/example-secrets.edn
 .#*
 scratch
