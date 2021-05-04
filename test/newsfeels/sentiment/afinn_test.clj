@@ -52,13 +52,16 @@
 (deftest test-calculate-valence
   (let [very-negative ["everything" "is" "terrible" "and" "i" "dont like" "it" "its" "the" "worst"]
         very-positive ["everything" "is" "outstanding" "and" "i" "love" "it" "its" "the" "best"]
-        neutral ["everything" "is" "okay" "dont like" "terrible" "superb"]]
+        neutral ["everything" "is" "okay" "dont like" "terrible" "superb"]
+        repeats ["best" "best"]]
     (is (= -8
            (afinn/calculate-valence mini-lexicon very-negative)))
     (is (= 11
            (afinn/calculate-valence mini-lexicon very-positive)))
     (is (= 0
-           (afinn/calculate-valence mini-lexicon neutral)))))
+           (afinn/calculate-valence mini-lexicon neutral)))
+    (is (= 6
+           (afinn/calculate-valence mini-lexicon repeats)))))
 
 (def example-articles
   [{:newsfeels.article/id
