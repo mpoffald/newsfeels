@@ -96,9 +96,7 @@
 
 (defn assoc-all-valence-scores
   [afinn articles]
-  (let [lexicon (-> afinn
-                    (:lexicon)
-                    (deref))
+  (let [{:keys [lexicon]} afinn 
         clean-and-calculate (fn [text]
                               (calculate-valence
                                lexicon
@@ -122,7 +120,7 @@
 
     (let [{:keys [lexicon-file]} component
           lexicon (edn/read-string (slurp lexicon-file))]
-      (assoc component :lexicon (atom lexicon))))
+      (assoc component :lexicon lexicon)))
 
   (stop [component]
     (info "Stopping Afinn")
