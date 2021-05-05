@@ -7,7 +7,7 @@
 (def secrets {:component1 {:secret1 "secret1"}
               :component2 {:secret2 "secret2"}})
 
-(deftest test-secrets
+(deftest test-prepare-get-in-secrets
   (let [prepared-secrets (secrets/prepare-secrets secrets)
         secrets-component {:secrets prepared-secrets}]
     (is (= "secret1"
