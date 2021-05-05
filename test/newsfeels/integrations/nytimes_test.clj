@@ -3,6 +3,7 @@
    [clojure.test :refer :all]
    [com.stuartsierra.component :as component]
    [newsfeels.integrations.nytimes :as nytimes]
+   [newsfeels.system.secrets :as secrets]
    [newsfeels.utils :as utils]
    [java-time :as time]))
 
@@ -126,7 +127,10 @@
 (deftest ^:integration test-nytimes
   (let [config (utils/get-config)
         test-system (component/system-map
-                     :nytimes (nytimes/nytimes-client (:nytimes config)))
+                     :secrets (secrets/secrets (:secrets config))
+                     :nytimes (component/using
+                               (nytimes/nytimes-client (:nytimes config))
+                               {:secrets :secrets}))
         started (component/start test-system)
         client (:nytimes started)]
     (try
