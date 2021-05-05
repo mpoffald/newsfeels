@@ -26,18 +26,18 @@
       (secret-fn))))
 
 (defrecord Secrets []
-    component/Lifecycle
+  component/Lifecycle
 
-    (start [component]
-      (info "Starting Secrets")
-      (let [{:keys [secrets-path]} component
-            secrets (edn/read-string (slurp secrets-path))
-            obscured-secrets (prepare-secrets secrets)]
-        (assoc component :secrets obscured-secrets)))
+  (start [component]
+    (info "Starting Secrets")
+    (let [{:keys [secrets-path]} component
+          secrets (edn/read-string (slurp secrets-path))
+          obscured-secrets (prepare-secrets secrets)]
+      (assoc component :secrets obscured-secrets)))
 
-    (stop [component]
-      (info "Stopping Secrets")
-      (assoc component :secrets nil)))
+  (stop [component]
+    (info "Stopping Secrets")
+    (assoc component :secrets nil)))
 
 (defn secrets
   [config]
