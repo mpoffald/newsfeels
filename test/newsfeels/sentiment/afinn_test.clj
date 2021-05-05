@@ -84,7 +84,7 @@
     "Did you know puppies are adorable? According to polls, 78% of people agree with the statement: “I don't like tragedy but I do like puppies.“"}])
 
 (deftest ^:integration test-afinn
-  (let [config {:afinn {:lexicon-file "test/resources/test-lexicon.edn"}} 
+  (let [config {:afinn {:lexicon-file "test-resources/test-lexicon.edn"}} 
         test-system (component/system-map
                      :afinn (afinn/afinn (:afinn config)))
         started (component/start test-system)
