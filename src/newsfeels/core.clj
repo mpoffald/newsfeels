@@ -5,6 +5,7 @@
    [clojure.set :as set]
    [newsfeels.utils :as utils]
    [newsfeels.integrations.nytimes :as nytimes]
+   [newsfeels.system.secrets :as secrets]
    [newsfeels.sentiment.afinn :as afinn])
   (:gen-class))
 
@@ -13,7 +14,10 @@
   (let [config (utils/get-config)]
     (component/system-map
      :afinn (afinn/afinn (get config :afinn))
-     :nytimes (nytimes/nytimes-client (get config :nytimes)))))
+     :secrets (secrets/secrets (get config :secrets))
+     :nytimes (component/using
+               (nytimes/nytimes-client (get config :nytimes))
+               {:secrets :secrets}))))
 
 (def system (make-system))
 

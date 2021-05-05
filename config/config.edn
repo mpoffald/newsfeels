@@ -1,4 +1,6 @@
 {:nytimes
  {:host "https://api.nytimes.com/"}
  :afinn
- {:lexicon-file "resources/AFINN-111.edn"}}
+ {:lexicon-file "resources/AFINN-111.edn"}
+ :secrets
+ {:secrets-path "secrets/secrets.edn"}}

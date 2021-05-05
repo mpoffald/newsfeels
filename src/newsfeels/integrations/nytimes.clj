@@ -3,7 +3,7 @@
    [clj-http.client :as client]
    [clojure.string :as str]
    [com.stuartsierra.component :as component]
-   [newsfeels.utils :as utils]
+   [newsfeels.system.secrets :as secrets]
    [taoensso.timbre :as timbre
     :refer [info warn error]]
    [java-time :as time]))
@@ -18,10 +18,10 @@
   Returns the body when successful,
   otherwise just logs info and returns nil."
   [client path]
-  (let [{:keys [api-key host]} client
+  (let [{:keys [secrets host]} client
         url (str host path)
         {:keys [:body :status] :as response} (client/get url {:as :json
-                                                              :query-params {"api-key" (utils/use-secret api-key)}
+                                                              :query-params {"api-key" (secrets/get-in-secrets secrets [:nytimes :api-key])}
                                                               :throw-exceptions false})]
     (cond
       (= status 200) body
@@ -149,14 +149,11 @@
 
   (start [component]
     (info "Starting NyTimesClient")
-
-    (let [{:keys [api-key]}
-          (utils/prepare-secrets)]    ;TODO do this better
-      (assoc component :api-key api-key)))
-
+    component)
+  
   (stop [component]
     (info "Stopping NyTimesClient")
-    (assoc component :api-key nil)))
+    component))
 
 (defn nytimes-client
   [config]

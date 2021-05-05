@@ -12,7 +12,7 @@ Get headlines and abstracts for the New York Times' most popular articles, and s
 
 ```clj
 ;; in secrets/secrets.edn:
-{:api-key "YOUR_API_KEY_HERE"}
+{:nytimes {:api-key "YOUR_API_KEY_HERE"}}
 ```
 
 ## Usage
